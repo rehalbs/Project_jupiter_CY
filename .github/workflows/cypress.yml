@@ -1,4 +1,3 @@
-# .github/workflows/cypress.yml
 name: Run Cypress Tests
 
 on:
@@ -21,7 +20,11 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Verify Cypress install
+        run: npx cypress verify
 
       - name: Run Cypress tests
         run: npx cypress run
+

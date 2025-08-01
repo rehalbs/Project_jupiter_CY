@@ -1,50 +1,37 @@
-// cypress/support/pages/ContactPage.js
-
 export class ContactPage {
-    // Click the Submit button if it's visible and enabled
+    // Click the Submit button for the Errors to generate
     clickSubmit() {
-        cy.contains('a', 'Submit').then(($btn) => {
-            if (!$btn.is(':visible')) {
-                throw new Error('Submit button is not visible');
-            }
-            if ($btn.is(':disabled')) {
-                throw new Error('Submit button is disabled');
-            }
-            cy.wrap($btn).click();
-        });
+        return cy.contains('a', 'Submit').click({ force: true });
     }
     // Capture the header message when submitting the form without mandatory fields
     getHeaderError() {
         return cy.contains('We welcome your feedback -').invoke('text');
     }
     // Get all form field validation error messages
-    getFormErrors() {
-        const errorsArray = [];
-        cy.get('.help-inline.ng-scope').each(($el) => {
-            if ($el.is(':visible')) {
-                errorsArray.push($el.text().trim());
-            }
-        });
-        return cy.wrap(errorsArray);
-    }
-    //submit the Feedback form
+getFormErrors() {
+  return cy.get('.help-inline.ng-scope').then($els => {
+    const errorsArray = $els.toArray()  // <-- convert to native array
+      .filter(el => Cypress.$(el).is(':visible'))
+      .map(el => el.textContent.trim());
+    return errorsArray;
+  });
+}
+    // Fill the Feedback form with Mandatory data
     feedbackFormFill(forename, email, message) {
-        cy.get('#forename').type(forename);
-        cy.get('#email').type(email);
-        cy.get('#message').type(message);
-        this.clickSubmit();
+        return cy.get('#forename').type(forename, { force: true })
+            .then(() => cy.get('#email').type(email, { force: true }))
+            .then(() => cy.get('#message').type(message, { force: true }));
     }
-    // Submit the form with mandatory fields
-    submitFeedbackForm() { }
-    //wait for the feedback confirimation pop up to appear annd then disappear
+
+    // Wait for confirmation popup to appear and disappear - so that same form can be submitted 5 times
     waitForFeedbackConfirmation() {
-        cy.contains('Sending Feedback').should('be.visible');
-        cy.contains('Sending Feedback', { timeout: 35000 }).should('not.exist');
-        cy.wait(2000); // optional buffer
+        return cy.contains('Sending Feedback').should('be.visible')
+            .then(() => cy.contains('Sending Feedback', { timeout: 35000 }).should('not.exist'))
+            .then(() => cy.wait(2000)); // Optional buffer
     }
+    // Get the success message after form submission
     getSuccessMessage() {
         return cy.get('.alert-success');
     }
-
-
 }
+

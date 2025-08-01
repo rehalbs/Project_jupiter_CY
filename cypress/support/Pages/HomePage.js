@@ -11,19 +11,20 @@ export class HomePage {
         //get the welcome text from class lead paragraph p
         return cy.get('p.lead').invoke('text');
     }
-    // check the Shopping button is working
-    isShoppingButtonWorking() {
-        //choping button locator 
-        const shopingBtn = cy.get('a.btn.btn-success.btn-large[href="#/shop"]')
-        // check the button is visible if not throw error
-        if ((!shopingBtn.should('be.visible'))) {
-            throw new Error('Shopping button is not visible');
-        }
-        //check that contact Link is visible
+
+    navigateToContactPage() {
+        return cy.get('#nav-contact a').should('be.visible').click();
+
     }
-    iscontactLinkVisible() {
-        return cy.get('#nav-contact a')
+    navigateHomePage() {
+        return cy.get('#nav-home a').should('be.visible').click();
+    }
+
+    // Click the Shopping button to navigate to the Shop page
+    navigateToShopPage() {
+        return cy.get('a.btn.btn-success.btn-large[href="#/shop"]')
             .should('be.visible')
             .click();
     }
+
 }
